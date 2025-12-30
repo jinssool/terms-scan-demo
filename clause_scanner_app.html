@@ -403,7 +403,8 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error('분석 중 오류가 발생했습니다.');
+                    const errorData = await response.json().catch(() => ({ error: '알 수 없는 오류가 발생했습니다.' }));
+                    throw new Error(errorData.error || errorData.message || `서버 오류 (${response.status})`);
                 }
 
                 const result = await response.json();
@@ -412,7 +413,8 @@
                 navTo('result');
             } catch (error) {
                 console.error('Error:', error);
-                handleAlert('분석 중 오류가 발생했습니다: ' + error.message);
+                const errorMessage = error.message || '분석 중 오류가 발생했습니다. API 키를 확인하거나 나중에 다시 시도해주세요.';
+                handleAlert(errorMessage);
                 navTo('input-text');
             }
         }
