@@ -438,8 +438,17 @@
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ error: '알 수 없는 오류가 발생했습니다.' }));
-                    throw new Error(errorData.error || errorData.message || `서버 오류 (${response.status})`);
+                    let errorData;
+                    try {
+                        errorData = await response.json();
+                    } catch (e) {
+                        errorData = { error: `서버 오류 (${response.status})`, message: '서버에서 응답을 파싱할 수 없습니다.' };
+                    }
+                    
+                    const errorMessage = errorData.error || errorData.message || `서버 오류 (${response.status})`;
+                    const hint = errorData.hint || '';
+                    
+                    throw new Error(hint ? `${errorMessage}\n${hint}` : errorMessage);
                 }
 
                 const result = await response.json();

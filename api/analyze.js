@@ -1,25 +1,6 @@
-// 모듈 로드 확인 및 에러 핸들링
-let GoogleGenerativeAI, OpenAI;
-try {
-    const genAIModule = require('@google/generative-ai');
-    GoogleGenerativeAI = genAIModule.GoogleGenerativeAI || genAIModule.default?.GoogleGenerativeAI;
-    if (!GoogleGenerativeAI) {
-        throw new Error('GoogleGenerativeAI를 찾을 수 없습니다.');
-    }
-} catch (error) {
-    console.error('Failed to load @google/generative-ai:', error);
-    throw new Error(`패키지 로드 오류: @google/generative-ai - ${error.message}`);
-}
-
-try {
-    OpenAI = require('openai');
-    if (!OpenAI) {
-        throw new Error('OpenAI를 찾을 수 없습니다.');
-    }
-} catch (error) {
-    console.error('Failed to load openai:', error);
-    throw new Error(`패키지 로드 오류: openai - ${error.message}`);
-}
+// 모듈 로드
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const OpenAI = require('openai');
 
 // 시스템 프롬프트
 const systemPrompt = `당신은 대학생 및 사회초년생을 위한 스마트한 약관 분석 전문가, **'약간 스캐너'**입니다. 당신의 목적은 복잡하고 방대한 회원가입 약관 및 개인정보 처리방침 뒤에 숨겨진 기업의 의도를 파악하고, 사용자가 입을 수 있는 피해를 사전에 차단하는 '디지털 권리 보호기' 역할을 수행하는 것입니다.
@@ -113,10 +94,26 @@ async function analyzeWithGemini(apiKey, content) {
         const response = await result.response;
         const responseText = response.text();
         
+        if (!responseText) {
+            throw new Error('Gemini API에서 응답을 받지 못했습니다.');
+        }
+        
         return parseJSONResponse(responseText);
     } catch (error) {
         console.error('Gemini API Error:', error);
-        throw new Error(`Gemini API 오류: ${error.message}`);
+        console.error('Error details:', {
+            message: error.message,
+            code: error.code,
+            status: error.status,
+            statusCode: error.statusCode
+        });
+        
+        // API 키 관련 오류인 경우
+        if (error.message?.includes('API_KEY') || error.message?.includes('401') || error.message?.includes('403')) {
+            throw new Error(`Gemini API 키가 유효하지 않습니다. API 키를 확인해주세요.`);
+        }
+        
+        throw new Error(`Gemini API 오류: ${error.message || '알 수 없는 오류'}`);
     }
 }
 
@@ -176,14 +173,20 @@ module.exports = async (req, res) => {
 
         console.log('Request received:', { 
             hasContent: !!content, 
+            contentLength: content?.length || 0,
             hasClientApiKey: !!clientApiKey, 
             model,
             hasEnvGeminiKey: !!process.env.GEMINI_API_KEY,
             hasEnvOpenAIKey: !!process.env.OPENAI_API_KEY
         });
 
-        if (!content) {
-            return res.status(400).json({ error: '콘텐츠가 필요합니다.' });
+        if (!content || typeof content !== 'string' || content.trim().length === 0) {
+            return res.status(400).json({ error: '콘텐츠가 필요합니다. 약관 텍스트를 입력해주세요.' });
+        }
+
+        // 콘텐츠 길이 제한 (너무 긴 경우)
+        if (content.length > 50000) {
+            return res.status(400).json({ error: '약관 텍스트가 너무 깁니다. 50,000자 이하로 입력해주세요.' });
         }
 
         // 환경 변수에서 API 키를 가져오거나, 클라이언트에서 전달받은 키 사용
@@ -193,15 +196,21 @@ module.exports = async (req, res) => {
         let result;
         if (model === 'gemini') {
             if (!geminiKey) {
-                return res.status(400).json({ error: 'Gemini API 키가 필요합니다. 환경 변수 GEMINI_API_KEY를 설정하거나 요청 본문에 apiKey를 포함해주세요.' });
+                return res.status(400).json({ 
+                    error: 'Gemini API 키가 필요합니다.',
+                    hint: 'Vercel 환경 변수에 GEMINI_API_KEY를 설정하거나, 로그인 화면에서 API 키를 입력해주세요.'
+                });
             }
-            console.log('Calling Gemini API...');
+            console.log('Calling Gemini API with key:', geminiKey.substring(0, 10) + '...');
             result = await analyzeWithGemini(geminiKey, content);
         } else if (model === 'chatgpt') {
             if (!openaiKey) {
-                return res.status(400).json({ error: 'OpenAI API 키가 필요합니다. 환경 변수 OPENAI_API_KEY를 설정하거나 요청 본문에 apiKey를 포함해주세요.' });
+                return res.status(400).json({ 
+                    error: 'OpenAI API 키가 필요합니다.',
+                    hint: 'Vercel 환경 변수에 OPENAI_API_KEY를 설정하거나, 로그인 화면에서 API 키를 입력해주세요.'
+                });
             }
-            console.log('Calling OpenAI API...');
+            console.log('Calling OpenAI API with key:', openaiKey.substring(0, 10) + '...');
             result = await analyzeWithChatGPT(openaiKey, content);
         } else {
             return res.status(400).json({ error: '지원하지 않는 모델입니다. (gemini 또는 chatgpt)' });
@@ -211,12 +220,23 @@ module.exports = async (req, res) => {
         res.status(200).json(result);
     } catch (error) {
         console.error('Analysis error:', error);
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
         console.error('Error stack:', error.stack);
-        res.status(500).json({ 
+        
+        // 더 자세한 에러 정보 반환
+        const errorResponse = {
             error: '분석 중 오류가 발생했습니다.',
-            message: error.message,
-            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-        });
+            message: error.message || '알 수 없는 오류',
+            type: error.name || 'Error'
+        };
+        
+        // 개발 환경에서만 스택 트레이스 포함
+        if (process.env.VERCEL_ENV === 'development' || process.env.NODE_ENV === 'development') {
+            errorResponse.stack = error.stack;
+        }
+        
+        res.status(500).json(errorResponse);
     }
 };
 
