@@ -125,15 +125,16 @@
                     <div class="mb-8">
                         <div class="w-20 h-20 bg-indigo-50 rounded-[2.5rem] flex items-center justify-center text-indigo-600 text-4xl mb-6 mx-auto shadow-sm"><i class="fa-solid fa-dog"></i></div>
                         <h2 class="text-2xl font-bold text-slate-900 mb-2">약간 스캐너</h2>
-                        <p class="text-slate-400 text-sm">내 권리를 지키기 위해 시작하세요.</p>
+                        <p class="text-slate-400 text-sm">내 권리를 지키기 위해 로그인하세요.</p>
                     </div>
                     <div class="w-full px-4 mb-8">
-                        <div class="input-group text-left"><i class="fa-solid fa-at"></i><input type="text" id="loginId" placeholder=" "><label>아이디 (선택사항)</label></div>
-                        <div class="input-group text-left mt-4"><i class="fa-solid fa-key"></i><input type="password" id="apiKey" placeholder=" "><label>API 키 (Gemini 또는 OpenAI)</label></div>
+                        <div class="input-group text-left"><i class="fa-solid fa-at"></i><input type="text" id="loginId" placeholder=" "><label>아이디 (이메일)</label></div>
+                        <div class="input-group text-left mt-4"><i class="fa-solid fa-lock"></i><input type="password" id="loginPw" placeholder=" "><label>비밀번호</label></div>
+                        <div class="input-group text-left mt-4"><i class="fa-solid fa-key"></i><input type="password" id="apiKey" placeholder=" "><label>API 키 (선택사항 - 환경 변수 설정 시 생략 가능)</label></div>
                         <p class="text-xs text-slate-400 mt-4 text-left px-1">API 키는 환경 변수로 설정되어 있으면 생략 가능합니다.</p>
                     </div>
                     <div class="w-full px-4">
-                        <button onclick="handleLogin()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-indigo-200 active:scale-95 transition-all">시작하기</button>
+                        <button onclick="handleLogin()" class="w-full bg-indigo-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-indigo-200 active:scale-95 transition-all">로그인</button>
                         <a href="index.html" class="mt-6 text-xs text-slate-400 font-medium inline-block">← 랜딩 페이지로 돌아가기</a>
                     </div>
                 </section>
@@ -196,14 +197,17 @@
                             </div>
                             <i class="fa-solid fa-chevron-right ml-auto text-slate-300"></i>
                         </div>
-                        <div class="selection-card p-6 rounded-3xl cursor-pointer flex items-center gap-6 opacity-60" onclick="handleAlert('이미지 분석 기능은 준비 중입니다.')">
-                            <div class="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400 text-3xl"><i class="fa-solid fa-camera"></i></div>
+                        <!-- 이미지 스캔 기능 활성화 -->
+                        <div class="selection-card p-6 rounded-3xl cursor-pointer flex items-center gap-6" onclick="triggerImageUpload()">
+                            <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 text-3xl"><i class="fa-solid fa-camera"></i></div>
                             <div>
                                 <h4 class="font-bold text-slate-800">이미지 스캔 (OCR)</h4>
-                                <p class="text-xs text-slate-400">약관을 캡처하셨나요?</p>
+                                <p class="text-xs text-slate-400">약관을 사진으로 찍으셨나요?</p>
                             </div>
                             <i class="fa-solid fa-chevron-right ml-auto text-slate-300"></i>
                         </div>
+                        <!-- 숨겨진 파일 입력 -->
+                        <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="handleImageSelection(event)">
                     </div>
                 </section>
 
@@ -226,8 +230,8 @@
                         <i class="fa-solid fa-dog text-7xl text-indigo-100 animate-jump"></i>
                     </div>
                     <div class="mt-10">
-                        <h3 class="text-xl font-bold text-slate-900">다크 패턴 탐지 중...</h3>
-                        <p class="text-slate-400 text-sm mt-2">동물 친구들이 열심히 찾고 있어요!</p>
+                        <h3 id="loading-text" class="text-xl font-bold text-slate-900">다크 패턴 탐지 중...</h3>
+                        <p id="loading-subtext" class="text-slate-400 text-sm mt-2">동물 친구들이 열심히 찾고 있어요!</p>
                     </div>
                     <div class="w-full max-w-xs mt-12 px-6">
                         <div class="progress-bar"><div id="loadingBar" class="progress-fill"></div></div>
@@ -366,6 +370,35 @@
             m.querySelector('.modal-content').classList.replace('scale-100', 'scale-90');
         }
 
+        // 이미지 파일 업로드 트리거
+        function triggerImageUpload() {
+            document.getElementById('imageInput').click();
+        }
+
+        // 이미지 선택 처리 (OCR 시뮬레이션 - 실제 OCR API 연동 필요)
+        function handleImageSelection(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // OCR 시뮬레이션 시작
+                navTo('loading');
+                document.getElementById('loading-text').innerText = "이미지에서 텍스트 추출 중...";
+                document.getElementById('loading-subtext').innerText = "OCR 엔진이 약관 글씨를 읽고 있어요!";
+                
+                // 실제로는 여기에 OCR API 호출이 들어가야 합니다
+                // 현재는 시뮬레이션으로 처리
+                setTimeout(() => {
+                    document.getElementById('loading-text').innerText = "다크 패턴 탐지 중...";
+                    document.getElementById('loading-subtext').innerText = "동물 친구들이 위험 요소를 찾고 있어요!";
+                    
+                    // 가상의 OCR 결과물로 분석 수행
+                    const simulatedText = "제5조 유료 멤버십은 무료 체험 7일 후 자동으로 유료 결제 전환됩니다. 또한 개인정보는 마케팅 목적으로 제3자에게 제공될 수 있습니다.";
+                    document.getElementById('termsInput').value = simulatedText;
+                    startAnalysis();
+                    handleAlert("멍멍! 사진 속 약관을 모두 읽어냈어요!");
+                }, 2000);
+            }
+        }
+
         // 텍스트 영역에 약관 붙여넣기 이벤트 감지
         document.addEventListener('DOMContentLoaded', function() {
             const termsInput = document.getElementById('termsInput');
@@ -382,6 +415,8 @@
             const input = document.getElementById('termsInput').value.trim();
             if (!input.trim()) return handleAlert('분석할 약관을 입력하세요.');
             
+            document.getElementById('loading-text').innerText = "다크 패턴 탐지 중...";
+            document.getElementById('loading-subtext').innerText = "동물 친구들이 열심히 찾고 있어요!";
             navTo('loading');
             
             try {

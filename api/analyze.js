@@ -1,5 +1,25 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const OpenAI = require('openai');
+// 모듈 로드 확인 및 에러 핸들링
+let GoogleGenerativeAI, OpenAI;
+try {
+    const genAIModule = require('@google/generative-ai');
+    GoogleGenerativeAI = genAIModule.GoogleGenerativeAI || genAIModule.default?.GoogleGenerativeAI;
+    if (!GoogleGenerativeAI) {
+        throw new Error('GoogleGenerativeAI를 찾을 수 없습니다.');
+    }
+} catch (error) {
+    console.error('Failed to load @google/generative-ai:', error);
+    throw new Error(`패키지 로드 오류: @google/generative-ai - ${error.message}`);
+}
+
+try {
+    OpenAI = require('openai');
+    if (!OpenAI) {
+        throw new Error('OpenAI를 찾을 수 없습니다.');
+    }
+} catch (error) {
+    console.error('Failed to load openai:', error);
+    throw new Error(`패키지 로드 오류: openai - ${error.message}`);
+}
 
 // 시스템 프롬프트
 const systemPrompt = `당신은 대학생 및 사회초년생을 위한 스마트한 약관 분석 전문가, **'약간 스캐너'**입니다. 당신의 목적은 복잡하고 방대한 회원가입 약관 및 개인정보 처리방침 뒤에 숨겨진 기업의 의도를 파악하고, 사용자가 입을 수 있는 피해를 사전에 차단하는 '디지털 권리 보호기' 역할을 수행하는 것입니다.
