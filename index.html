@@ -1,5 +1,346 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head><meta charset="UTF-8"><title>서비스 준비중</title></head>
-<body><h1>🚧 사이트 배포 준비 완료</h1><p>팀원 파일 대기중...</p><a href="app.html">앱 체험하기 (Mockup)</a></body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>약간 스캐너 | 당신의 디지털 주권을 지키는 AI 방패</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;700;800&display=swap');
+        
+        :root { scroll-behavior: smooth; }
+        body { font-family: 'Pretendard', sans-serif; overflow-x: hidden; }
+
+        .gradient-text { 
+            background: linear-gradient(135deg, #4f46e5, #9333ea); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+
+        .bg-gradient-custom { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+
+        .reveal { 
+            opacity: 0; 
+            transform: translateY(30px); 
+            transition: all 0.8s ease-out; 
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        
+        /* 약관 하이라이트 효과 */
+        .term-highlight-red { background-color: #fee2e2; color: #dc2626; font-weight: 600; padding: 0 2px; border-radius: 4px; border-bottom: 2px solid #ef4444; }
+        .term-highlight-orange { background-color: #ffedd5; color: #ea580c; font-weight: 600; padding: 0 2px; border-radius: 4px; border-bottom: 2px solid #f97316; }
+        .term-highlight-blue { background-color: #e0e7ff; color: #4338ca; font-weight: 600; padding: 0 2px; border-radius: 4px; border-bottom: 2px solid #6366f1; }
+
+        #summaryModal { transition: opacity 0.3s ease, visibility 0.3s ease; }
+        .modal-content { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
+                <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i>
+                </div>
+                <span class="font-bold text-xl tracking-tight">약간 스캐너</span>
+            </div>
+            
+            <div class="flex items-center gap-4 md:gap-8">
+                <div class="hidden md:flex gap-8 text-sm font-semibold text-slate-600 mr-4">
+                    <a href="#scan" class="hover:text-indigo-600 transition">직접 스캔</a>
+                    <a href="#library" class="hover:text-indigo-600 transition">약관 라이브러리</a>
+                    <a href="#solution" class="hover:text-indigo-600 transition">해결책</a>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="text-slate-600 px-4 py-2.5 rounded-full text-sm font-bold hover:bg-slate-100 transition">
+                        로그인
+                    </button>
+                    <a href="clause_scanner_app.html" class="bg-indigo-600 text-white px-5 py-2.5 rounded-full text-sm font-bold shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition">
+                        시작하기
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="pt-32 pb-20 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <h2 class="text-indigo-600 font-bold mb-4 tracking-widest uppercase text-sm">Stop 'Agree All' Pattern</h2>
+            <h1 class="text-4xl md:text-7xl font-extrabold mb-8 leading-tight">
+                오늘도 <span class="gradient-text">전체 동의</span> <br class="hidden md:block">그냥 누르셨나요?
+            </h1>
+            <p class="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
+                방대한 텍스트 속에 숨겨진 자동 결제와 개인정보 유출 리스크, <br class="hidden md:block">
+                이제 AI가 3초 만에 당신의 '디지털 주권'을 찾아드립니다.
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <a href="#scan" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:scale-105 transition shadow-2xl flex items-center justify-center">
+                    내 약관 스캔해보기
+                </a>
+                <button class="bg-white border border-slate-200 text-slate-600 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-slate-50 transition">
+                    서비스 소개 영상 <i class="fa-solid fa-play ml-2 text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Scanning Simulation Section -->
+    <section id="scan" class="py-24 bg-white px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h3 class="text-3xl md:text-4xl font-bold mb-4">내 약관 스캔해보기</h3>
+                <p class="text-slate-500">복사한 약관을 붙여넣으면 AI가 실시간으로 위험 요소를 분석합니다.</p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-10 items-start">
+                <!-- Input Area -->
+                <div class="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 shadow-inner relative overflow-hidden">
+                    <div id="scanOverlay" class="absolute inset-0 bg-slate-50/80 z-20 flex flex-col items-center justify-center opacity-0 invisible transition-all duration-300">
+                        <i class="fa-solid fa-circle-notch text-4xl text-indigo-500 animate-spin mb-3"></i>
+                        <p class="font-bold text-slate-600">AI 분석 중...</p>
+                    </div>
+                    <label class="block text-sm font-bold text-slate-400 mb-4 uppercase tracking-widest">약관 텍스트 입력</label>
+                    <textarea id="termsInput" rows="12" class="w-full bg-white border border-slate-200 rounded-2xl p-6 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition" placeholder="분석할 약관 내용을 여기에 붙여넣으세요..."></textarea>
+                    <button onclick="simulateScan()" class="w-full mt-6 bg-indigo-600 text-white py-5 rounded-2xl font-black text-lg hover:bg-indigo-700 transition shadow-xl shadow-indigo-100 flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> AI 리포트 재생성
+                    </button>
+                </div>
+
+                <!-- Simulation Result Area -->
+                <div id="scanResult" class="bg-slate-900 text-slate-300 p-8 rounded-[2.5rem] shadow-2xl min-h-[480px] relative overflow-hidden group border border-slate-800">
+                    <div class="relative z-10 h-full flex flex-col">
+                        <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-800">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                                <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">AI 시뮬레이션 화면</span>
+                            </div>
+                            <div class="flex gap-1.5">
+                                <div class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Result View (Always Visible by Default) -->
+                        <div id="highlightedBox" class="flex-grow text-sm leading-relaxed font-medium overflow-y-auto pr-2">
+                            <!-- 하이라이트된 텍스트가 여기에 렌더링됨 -->
+                        </div>
+
+                        <!-- Result Legend -->
+                        <div class="mt-8 pt-6 border-t border-slate-800 grid grid-cols-3 gap-4">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded bg-rose-500"></span>
+                                <span class="text-[10px] font-bold">위험 조항</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded bg-amber-500"></span>
+                                <span class="text-[10px] font-bold">주의 조항</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded bg-indigo-500"></span>
+                                <span class="text-[10px] font-bold">개인정보</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Library Section -->
+    <section id="library" class="py-24 bg-slate-50 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h3 class="text-3xl md:text-4xl font-bold mb-4">자주 쓰는 서비스, 이미 분석 완료했습니다</h3>
+                <p class="text-slate-500">궁금한 서비스의 아이콘을 클릭하여 핵심 약관 요약을 확인해보세요.</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
+                <div class="reveal bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition cursor-pointer text-center" onclick="showSummary('여기어때')">
+                    <div class="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl"><i class="fa-solid fa-hotel"></i></div>
+                    <h5 class="font-bold">여기어때</h5>
+                </div>
+                <div class="service-card reveal bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition cursor-pointer text-center" onclick="showSummary('야놀자')">
+                    <div class="w-16 h-16 bg-pink-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-pink-500 text-2xl"><i class="fa-solid fa-bed"></i></div>
+                    <h5 class="font-bold">야놀자</h5>
+                </div>
+                <div class="service-card reveal bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition cursor-pointer text-center" onclick="showSummary('트립닷컴')">
+                    <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-blue-500 text-2xl"><i class="fa-solid fa-plane"></i></div>
+                    <h5 class="font-bold">트립닷컴</h5>
+                </div>
+                <div class="service-card reveal bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition cursor-pointer text-center" onclick="showSummary('인스타그램')">
+                    <div class="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-purple-500 text-2xl"><i class="fa-brands fa-instagram"></i></div>
+                    <h5 class="font-bold">인스타그램</h5>
+                </div>
+                <div class="service-card reveal bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-2 transition cursor-pointer text-center" onclick="showSummary('카카오톡')">
+                    <div class="w-16 h-16 bg-yellow-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-yellow-600 text-2xl"><i class="fa-solid fa-comment"></i></div>
+                    <h5 class="font-bold">카카오톡</h5>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Section (AI Assistant) -->
+    <section id="solution" class="py-24 bg-gradient-custom text-white px-6 overflow-hidden">
+        <div class="max-w-7xl mx-auto text-center mb-16">
+            <h3 class="text-3xl md:text-5xl font-extrabold mb-8 leading-tight">3초 만에 끝나는 AI 법률 비서</h3>
+        </div>
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center text-left">
+            <div class="reveal space-y-8">
+                <div class="flex gap-6">
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-bolt"></i></div>
+                    <div><h5 class="font-bold text-xl mb-1">초고속 텍스트 스캔</h5><p class="text-white/70 text-sm">이미지 속 약관을 읽어 독소 조항을 실시간 탐지합니다.</p></div>
+                </div>
+                <div class="flex gap-6">
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-user-shield"></i></div>
+                    <div>
+                        <h5 class="font-bold text-xl mb-1">개인 맞춤형 정보 탐지</h5>
+                        <p class="text-white/70 text-sm">성명, 주소, 이메일 등 당신이 노출하기 싫은 개인정보가 약관 내 위험하게 포함되어 있는지 확인합니다.</p>
+                    </div>
+                </div>
+                <div class="flex gap-6">
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-brain"></i></div>
+                    <div><h5 class="font-bold text-xl mb-1">사용자 맞춤형 분석</h5><p class="text-white/70 text-sm">개인정보 제공 기준을 직접 설정하고 맞춤형 경고를 받으세요.</p></div>
+                </div>
+                <div class="flex gap-6">
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shrink-0"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div><h5 class="font-bold text-xl mb-1">법률 데이터베이스</h5><p class="text-white/70 text-sm">최신 판례와 공정위 권고안을 기준으로 정확한 리스크를 판별합니다.</p></div>
+                </div>
+            </div>
+            <div class="reveal relative">
+                <div class="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-[3rem] shadow-2xl relative z-10">
+                    <div class="bg-white text-slate-900 p-6 rounded-2xl mb-4 shadow-lg transform -rotate-2 hover:rotate-0 transition duration-300">
+                        <span class="text-[10px] bg-rose-500 text-white px-2 py-0.5 rounded-full font-bold">위험</span>
+                        <p class="font-bold mt-2">"7일 후 자동 유료 결제 발견"</p>
+                        <p class="text-xs text-slate-500 mt-1">사용자의 명시적 동의 없는 자동 결제 조항입니다.</p>
+                    </div>
+                    <div class="bg-indigo-50 text-slate-900 p-6 rounded-2xl mb-4 shadow-lg transform translate-x-5 rotate-1 hover:rotate-0 transition duration-300 border-l-4 border-indigo-600">
+                        <span class="text-[10px] bg-indigo-600 text-white px-2 py-0.5 rounded-full font-bold">개인정보 탐지</span>
+                        <p class="font-bold mt-2 text-indigo-700">성명/주소/이메일 제공 발견</p>
+                        <p class="text-xs text-slate-500 mt-1">사용자가 설정한 '민감 정보 공유 거부'와 충돌하는 조항입니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Summary Modal -->
+    <div id="summaryModal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-950/60 backdrop-blur-sm opacity-0 invisible">
+        <div class="modal-content bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden transform scale-90">
+            <div class="p-8 border-b border-slate-100 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div id="modalIcon" class="w-10 h-10 rounded-xl flex items-center justify-center text-xl"></div>
+                    <h4 id="modalTitle" class="text-2xl font-extrabold">서비스명</h4>
+                </div>
+                <button onclick="closeModal()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-rose-100 hover:text-rose-500 transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="p-8 space-y-4 max-h-[60vh] overflow-y-auto" id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-12 bg-slate-950 text-slate-500 text-center text-sm">
+        <div class="max-w-7xl mx-auto px-6 text-white opacity-50 font-bold mb-4">약간 스캐너</div>
+        <p>© 2025 약간 스캐너 Team. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        const analyses = {
+            '여기어때': { icon: 'fa-hotel', color: 'bg-red-50 text-red-500', risks: [{ level: 'RED', title: '취소 수수료 조항', desc: '예약 직후 취소 시에도 결제 금액의 100%가 부과될 수 있습니다.' }] },
+            '야놀자': { icon: 'fa-bed', color: 'bg-pink-50 text-pink-500', risks: [{ level: 'RED', title: '자동 유료 전환', desc: '무료 체험 기간 종료 후 사전 안내 없이 자동 결제될 수 있습니다.' }] },
+            '트립닷컴': { icon: 'fa-plane', color: 'bg-blue-50 text-blue-500', risks: [{ level: 'RED', title: '해외 결제 수수료', desc: '이중 환전 수수료가 발생할 수 있는 내용이 명시되어 있습니다.' }] },
+            '인스타그램': { icon: 'fa-brands fa-instagram', color: 'bg-purple-50 text-purple-500', risks: [{ level: 'RED', title: '광범위한 데이터 수집', desc: '타 앱 사용 기록 및 위치 정보를 수집하여 광고에 활용합니다.' }] },
+            '카카오톡': { icon: 'fa-comment', color: 'bg-yellow-50 text-yellow-600', risks: [{ level: 'YELLOW', title: '맞춤형 광고 노출', desc: '이용 패턴을 분석하여 채널 광고 노출에 활용합니다.' }] }
+        };
+
+        // 핵심 분석 엔진 로직 (텍스트에 하이라이트 적용)
+        function getHighlightedContent(text) {
+            return text
+                .replace(/(환불이 불가능|청약철회가 제한|취소 수수료|100%가 부과)/g, '<span class="term-highlight-red">$1</span>')
+                .replace(/(자동으로 결제|유료로 전환|사전 안내 없이|자동 유료 전환)/g, '<span class="term-highlight-orange">$1</span>')
+                .replace(/(성명|주소|이메일|연락처|개인정보|이용기록|위치 정보)/g, '<span class="term-highlight-blue">$1</span>');
+        }
+
+        // 분석 시뮬레이션 함수 (재생성 시에만 로딩 효과)
+        function simulateScan() {
+            const input = document.getElementById('termsInput').value;
+            if (!input.trim()) return alert("약관 내용을 입력해주세요.");
+
+            const overlay = document.getElementById('scanOverlay');
+            const highlightedBox = document.getElementById('highlightedBox');
+            
+            // 로딩 오버레이 표시
+            overlay.style.opacity = '1';
+            overlay.classList.remove('invisible');
+            
+            setTimeout(() => {
+                overlay.classList.add('invisible');
+                overlay.style.opacity = '0';
+                
+                const result = getHighlightedContent(input);
+                highlightedBox.innerHTML = result || "분석할 수 있는 특정 키워드가 발견되지 않았습니다.";
+            }, 1000);
+        }
+
+        // 페이지 로드 시 초기 실행
+        window.onload = () => {
+            const sampleText = `[약간 스캐너 서비스 약관 예시]
+제12조: 사용자가 유료 멤버십 가입 시, 7일의 무료 기간 이후 서비스는 자동으로 결제되며 사전에 별도의 안내 없이 유료로 전환됩니다. 
+제15조: 사용자의 성명, 주소, 이메일은 마케팅 활용을 위해 제3자에게 제공될 수 있습니다. 
+디지털 콘텐츠 특성상 스트리밍이 시작되면 청약철회가 제한되어 환불이 불가능합니다.`;
+            
+            const termsInput = document.getElementById('termsInput');
+            const highlightedBox = document.getElementById('highlightedBox');
+            
+            // 입력창에 예시 텍스트 넣기
+            termsInput.value = sampleText;
+            
+            // 시뮬레이션 화면에 결과 즉시 표시 (로딩 없이)
+            highlightedBox.innerHTML = getHighlightedContent(sampleText);
+            
+            revealOnScroll();
+        };
+
+        const revealOnScroll = () => {
+            document.querySelectorAll('.reveal').forEach(reveal => {
+                if (reveal.getBoundingClientRect().top < window.innerHeight * 0.85) reveal.classList.add('active');
+            });
+        };
+        window.addEventListener('scroll', revealOnScroll);
+
+        const showSummary = (name) => {
+            const data = analyses[name];
+            const modal = document.getElementById('summaryModal');
+            document.getElementById('modalTitle').innerText = name;
+            const iconContainer = document.getElementById('modalIcon');
+            iconContainer.className = `w-12 h-12 rounded-xl flex items-center justify-center text-2xl ${data.color}`;
+            iconContainer.innerHTML = `<i class="fa-solid ${data.icon}"></i>`;
+            document.getElementById('modalBody').innerHTML = data.risks.map(risk => `
+                <div class="p-5 rounded-2xl ${risk.level === 'RED' ? 'bg-rose-50 border-l-4 border-rose-500' : 'bg-amber-50 border-l-4 border-amber-500'}">
+                    <span class="text-[10px] font-black uppercase ${risk.level === 'RED' ? 'text-rose-600' : 'text-amber-600'}">${risk.level} RISK</span>
+                    <h5 class="font-bold mb-1">${risk.title}</h5><p class="text-sm text-slate-600 leading-relaxed">${risk.desc}</p>
+                </div>`).join('');
+            modal.classList.remove('invisible'); modal.classList.add('opacity-100');
+            modal.querySelector('.modal-content').classList.remove('scale-90'); modal.querySelector('.modal-content').classList.add('scale-100');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeModal = () => {
+            const modal = document.getElementById('summaryModal');
+            modal.classList.remove('opacity-100'); modal.classList.add('invisible');
+            modal.querySelector('.modal-content').classList.remove('scale-100'); modal.querySelector('.modal-content').classList.add('scale-90');
+            document.body.style.overflow = '';
+        };
+    </script>
+</body>
 </html>
